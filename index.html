@@ -1,0 +1,894 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>PolyBot v14.0</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #080c10;
+  --card: #0e1318;
+  --card2: #131a20;
+  --border: #1e2830;
+  --border2: #243040;
+  --text: #e8f0f8;
+  --sub: #8aa0b8;
+  --muted: #4a6070;
+  --g: #00e07a;
+  --gd: rgba(0,224,122,.08);
+  --gb: rgba(0,224,122,.25);
+  --r: #ff4466;
+  --rd: rgba(255,68,102,.08);
+  --rb: rgba(255,68,102,.25);
+  --b: #4488ff;
+  --bd: rgba(68,136,255,.08);
+  --bb: rgba(68,136,255,.25);
+  --y: #ffb800;
+  --yd: rgba(255,184,0,.08);
+  --yb: rgba(255,184,0,.25);
+  --p: #aa88ff;
+  --sm: 8px;
+  --md: 12px;
+}
+[data-theme="light"]{
+  --bg:#f0f4f8;--card:#fff;--card2:#f5f8fa;--border:#dde4ec;--border2:#c8d4e0;
+  --text:#0a1520;--sub:#506070;--muted:#8090a0;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-height:100vh;overflow-x:hidden}
+.mono{font-family:'IBM Plex Mono',monospace}
+
+/* ── LOGIN ── */
+#login{position:fixed;inset:0;z-index:9999;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:24px}
+.login-box{width:100%;max-width:360px}
+.login-logo{font-size:32px;font-weight:800;letter-spacing:-2px;margin-bottom:4px}
+.login-logo em{color:var(--g);font-style:normal}
+.login-logo span{font-size:14px;color:var(--muted);font-weight:400;letter-spacing:0}
+.login-sub{font-size:13px;color:var(--sub);margin-bottom:28px}
+.login-field{margin-bottom:12px}
+.login-label{font-size:11px;font-weight:600;color:var(--muted);letter-spacing:1px;text-transform:uppercase;display:block;margin-bottom:6px}
+.login-inp{width:100%;background:var(--card);border:1.5px solid var(--border2);border-radius:var(--sm);padding:12px 14px;font-family:'Syne',sans-serif;font-size:14px;color:var(--text);outline:none;transition:border-color .2s}
+.login-inp:focus{border-color:var(--g)}
+.login-btn{width:100%;padding:14px;background:var(--g);border:none;border-radius:var(--sm);font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:#000;cursor:pointer;margin-top:8px;transition:opacity .2s}
+.login-btn:active{opacity:.85}
+.login-err{font-size:12px;color:var(--r);margin-top:8px;display:none}
+.login-err.show{display:block}
+
+/* ── SETUP ── */
+#setup{display:none;padding:20px;max-width:480px;margin:0 auto}
+.setup-logo{font-size:28px;font-weight:800;letter-spacing:-1.5px;margin-bottom:4px}
+.setup-logo em{color:var(--g);font-style:normal}
+.setup-sub{font-size:13px;color:var(--sub);margin-bottom:24px}
+.setup-section{font-size:11px;font-weight:700;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:10px;margin-top:20px}
+.setup-field{margin-bottom:10px}
+.setup-label{font-size:11px;color:var(--sub);display:block;margin-bottom:5px}
+.setup-inp{width:100%;background:var(--card);border:1.5px solid var(--border2);border-radius:var(--sm);padding:10px 12px;font-family:'IBM Plex Mono',monospace;font-size:13px;color:var(--text);outline:none;transition:border-color .2s}
+.setup-inp:focus{border-color:var(--g)}
+.setup-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.launch-btn{width:100%;padding:14px;background:var(--g);border:none;border-radius:var(--sm);font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:#000;cursor:pointer;margin-top:16px;transition:opacity .2s}
+.launch-btn:active{opacity:.85}
+.saved-badge{font-size:11px;color:var(--g);text-align:center;margin-top:8px}
+
+/* ── APP ── */
+#app{display:none;min-height:100vh}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--bg);z-index:100}
+.logo{font-size:20px;font-weight:800;letter-spacing:-1px}
+.logo em{color:var(--g);font-style:normal}
+.logo-v{font-size:11px;color:var(--muted);font-weight:400;margin-left:4px}
+.topbar-actions{display:flex;gap:8px;align-items:center}
+.ibtn{background:var(--card);border:1px solid var(--border2);border-radius:6px;padding:6px 10px;font-family:'Syne',sans-serif;font-size:11px;font-weight:700;color:var(--sub);cursor:pointer;transition:all .15s}
+.ibtn:active{transform:scale(.95)}
+.scan-btn{background:var(--gd);border:1px solid var(--gb);color:var(--g);display:flex;align-items:center;gap:5px;padding:7px 12px;border-radius:6px;font-family:'Syne',sans-serif;font-size:12px;font-weight:700;cursor:pointer;transition:all .15s}
+.scan-btn.loading{opacity:.6;pointer-events:none}
+.sdot{width:7px;height:7px;border-radius:50%;background:var(--g);animation:pulse 1.2s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.8)}}
+
+/* ── TABS ── */
+.tabs{display:flex;border-bottom:1px solid var(--border);overflow-x:auto;scrollbar-width:none;position:sticky;top:53px;background:var(--bg);z-index:99}
+.tabs::-webkit-scrollbar{display:none}
+.tab{padding:12px 16px;font-size:12px;font-weight:700;color:var(--muted);cursor:pointer;white-space:nowrap;border-bottom:2px solid transparent;transition:all .15s;letter-spacing:.5px}
+.tab.on{color:var(--g);border-bottom-color:var(--g)}
+.view{display:none;padding:14px 16px}
+.view.on{display:block}
+
+/* ── URL INPUT ── */
+.url-bar{display:flex;gap:8px;margin-bottom:14px}
+.url-inp{flex:1;background:var(--card);border:1.5px solid var(--border2);border-radius:var(--sm);padding:10px 12px;font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--text);outline:none;transition:border-color .2s}
+.url-inp:focus{border-color:var(--b)}
+.url-inp::placeholder{color:var(--muted)}
+.url-add{padding:10px 14px;background:var(--bd);border:1px solid var(--bb);border-radius:var(--sm);font-family:'Syne',sans-serif;font-size:12px;font-weight:700;color:var(--b);cursor:pointer;white-space:nowrap;transition:all .15s}
+.url-add:active{transform:scale(.97)}
+
+/* ── SIGNAL CARDS ── */
+.feed{display:flex;flex-direction:column;gap:10px}
+.sig-card{background:var(--card);border:1px solid var(--border);border-radius:var(--md);overflow:hidden;transition:border-color .3s}
+.sig-card.bullish{border-left:3px solid var(--g)}
+.sig-card.bearish{border-left:3px solid var(--r)}
+.sig-card.neutral{border-left:3px solid var(--border2)}
+.card-top{padding:12px 14px;display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+.card-q{font-size:14px;font-weight:700;line-height:1.4;flex:1}
+.card-pill{font-size:10px;font-weight:700;padding:4px 9px;border-radius:5px;white-space:nowrap;flex-shrink:0}
+.pill-yes{background:var(--gd);border:1px solid var(--gb);color:var(--g)}
+.pill-no{background:var(--rd);border:1px solid var(--rb);color:var(--r)}
+.pill-skip{background:var(--card2);border:1px solid var(--border2);color:var(--muted)}
+.pill-loading{background:var(--bd);border:1px solid var(--bb);color:var(--b)}
+.card-meta{padding:0 14px 10px;display:flex;gap:6px;flex-wrap:wrap}
+.meta-tag{font-size:10px;font-family:'IBM Plex Mono',monospace;padding:3px 7px;border-radius:4px;background:var(--card2);border:1px solid var(--border);color:var(--sub)}
+.meta-tag.live{border-color:var(--gb);color:var(--g)}
+.card-analysis{padding:10px 14px;background:var(--card2);margin:0 10px 10px;border-radius:8px;font-size:12px;color:var(--sub);line-height:1.7;border:1px solid var(--border)}
+.card-metrics{padding:0 14px;display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:10px}
+.metric{background:var(--card2);border:1px solid var(--border);border-radius:6px;padding:7px 6px;text-align:center}
+.metric-v{font-size:14px;font-weight:700;font-family:'IBM Plex Mono',monospace}
+.metric-l{font-size:9px;color:var(--muted);margin-top:2px;letter-spacing:.5px}
+.card-actions{padding:10px 14px 14px;display:flex;gap:8px}
+.act-yes{flex:1;padding:11px;background:var(--gd);border:1.5px solid var(--gb);border-radius:var(--sm);font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:var(--g);cursor:pointer;transition:all .15s}
+.act-no{flex:1;padding:11px;background:var(--rd);border:1.5px solid var(--rb);border-radius:var(--sm);font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:var(--r);cursor:pointer;transition:all .15s}
+.act-skip{padding:11px 14px;background:var(--card2);border:1px solid var(--border2);border-radius:var(--sm);font-family:'Syne',sans-serif;font-size:12px;font-weight:700;color:var(--muted);cursor:pointer;transition:all .15s}
+.act-yes:active,.act-no:active,.act-skip:active{transform:scale(.97)}
+.act-yes:disabled,.act-no:disabled{opacity:.35;pointer-events:none}
+.card-done{padding:10px 14px 14px;font-size:12px;color:var(--sub);font-style:italic}
+
+/* ── EMPTY / ERROR ── */
+.empty{text-align:center;padding:48px 20px;color:var(--muted)}
+.empty-icon{font-size:32px;margin-bottom:10px}
+.empty-text{font-size:13px}
+.err-card{background:var(--rd);border:1px solid var(--rb);border-radius:var(--sm);padding:10px 12px;font-size:11px;color:var(--r);margin:0 14px 10px;font-family:'IBM Plex Mono',monospace}
+
+/* ── THINKING ── */
+.thinking{display:flex;align-items:center;gap:6px;padding:12px 14px;font-size:12px;color:var(--b)}
+.dots span{display:inline-block;width:5px;height:5px;border-radius:50%;background:var(--b);margin:0 1px;animation:dot 1.2s ease-in-out infinite}
+.dots span:nth-child(2){animation-delay:.2s}
+.dots span:nth-child(3){animation-delay:.4s}
+@keyframes dot{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-6px)}}
+
+/* ── PORTFOLIO ── */
+.port-header{text-align:center;padding:20px 0 16px}
+.pnl-big{font-size:40px;font-weight:800;font-family:'IBM Plex Mono',monospace;letter-spacing:-2px}
+.pnl-big.pos{color:var(--g)}
+.pnl-big.neg{color:var(--r)}
+.pnl-big.zer{color:var(--sub)}
+.pnl-label{font-size:11px;color:var(--muted);margin-top:2px;letter-spacing:1px}
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px}
+.stat-box{background:var(--card);border:1px solid var(--border);border-radius:var(--sm);padding:10px 8px;text-align:center}
+.stat-v{font-size:16px;font-weight:700;font-family:'IBM Plex Mono',monospace}
+.stat-l{font-size:9px;color:var(--muted);margin-top:3px;letter-spacing:.5px}
+.sec-title{font-size:11px;font-weight:700;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center}
+.refresh-btn{font-size:10px;font-weight:700;color:var(--b);cursor:pointer;background:var(--bd);border:1px solid var(--bb);border-radius:5px;padding:3px 8px}
+.pos-card{background:var(--card);border:1px solid var(--border);border-radius:var(--sm);padding:12px 14px;margin-bottom:8px}
+.pos-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;gap:8px}
+.pos-q{font-size:13px;font-weight:600;line-height:1.4;flex:1}
+.pos-pnl{font-size:14px;font-weight:700;font-family:'IBM Plex Mono',monospace;flex-shrink:0}
+.pos-pnl.pos{color:var(--g)}
+.pos-pnl.neg{color:var(--r)}
+.pos-bottom{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.pos-tag{font-size:10px;font-weight:700;padding:3px 8px;border-radius:4px}
+.pos-tag.yes{background:var(--gd);color:var(--g);border:1px solid var(--gb)}
+.pos-tag.no{background:var(--rd);color:var(--r);border:1px solid var(--rb)}
+.pos-meta{font-size:10px;color:var(--muted);font-family:'IBM Plex Mono',monospace;flex:1}
+.close-btn{font-size:10px;font-weight:700;padding:4px 10px;background:var(--card2);border:1px solid var(--border2);border-radius:5px;color:var(--sub);cursor:pointer;transition:all .15s}
+.close-btn:active{transform:scale(.95)}
+.updated-time{font-size:10px;color:var(--muted);text-align:right;margin-bottom:8px}
+
+/* ── LOG ── */
+.log-item{background:var(--card);border:1px solid var(--border);border-radius:var(--sm);padding:12px 14px;margin-bottom:8px;cursor:pointer}
+.log-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
+.log-side{font-size:11px;font-weight:700;padding:2px 8px;border-radius:4px}
+.log-side.yes{background:var(--gd);color:var(--g);border:1px solid var(--gb)}
+.log-side.no{background:var(--rd);color:var(--r);border:1px solid var(--rb)}
+.log-status{font-size:11px;font-weight:700}
+.log-q{font-size:12px;color:var(--sub);margin-bottom:3px;line-height:1.4}
+.log-meta{font-size:10px;color:var(--muted);font-family:'IBM Plex Mono',monospace}
+.log-detail{display:none;margin-top:10px;padding-top:10px;border-top:1px solid var(--border)}
+.log-detail-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.log-detail-item{background:var(--card2);border-radius:5px;padding:6px 8px;text-align:center}
+.log-detail-v{font-size:12px;font-weight:700;font-family:'IBM Plex Mono',monospace}
+.log-detail-l{font-size:9px;color:var(--muted);margin-top:2px}
+
+/* ── TOASTS ── */
+#toasts{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);z-index:9999;display:flex;flex-direction:column;gap:6px;width:calc(100% - 32px);max-width:360px;pointer-events:none}
+.toast{background:var(--card2);border:1px solid var(--border2);border-radius:var(--sm);padding:10px 14px;font-size:12px;font-weight:600;text-align:center;transition:opacity .3s}
+.toast.ok{border-color:var(--gb);color:var(--g)}
+.toast.err{border-color:var(--rb);color:var(--r)}
+.toast.warn{border-color:var(--yb);color:var(--y)}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login">
+  <div class="login-box">
+    <div class="login-logo">Poly<em>Bot</em> <span>v14.0</span></div>
+    <div class="login-sub">Prediction market intelligence</div>
+    <div class="login-field">
+      <label class="login-label">Username</label>
+      <input class="login-inp" id="l-user" type="text" placeholder="username" autocapitalize="none"/>
+    </div>
+    <div class="login-field">
+      <label class="login-label">Password</label>
+      <input class="login-inp" id="l-pass" type="password" placeholder="password" onkeydown="if(event.key==='Enter')doLogin()"/>
+    </div>
+    <button class="login-btn" onclick="doLogin()">Enter →</button>
+    <div class="login-err" id="login-err">Incorrect credentials</div>
+  </div>
+</div>
+
+<!-- SETUP -->
+<div id="setup">
+  <div class="setup-logo">Poly<em>Bot</em> <span style="font-size:12px;color:var(--muted);font-weight:400">v14.0</span></div>
+  <div class="setup-sub">Configure your trading assistant</div>
+  <div class="setup-section">Anthropic API</div>
+  <div class="setup-field">
+    <label class="setup-label">API Key (sk-ant-...)</label>
+    <input class="setup-inp" id="s-key" type="password" placeholder="sk-ant-api03-..."/>
+  </div>
+  <div class="setup-section">Bankroll</div>
+  <div class="setup-row">
+    <div class="setup-field">
+      <label class="setup-label">Starting balance (£)</label>
+      <input class="setup-inp" id="s-bal" type="number" value="75"/>
+    </div>
+    <div class="setup-field">
+      <label class="setup-label">Default stake (£)</label>
+      <input class="setup-inp" id="s-stake" type="number" value="10"/>
+    </div>
+  </div>
+  <button class="launch-btn" onclick="launch()">Launch PolyBot →</button>
+  <div class="saved-badge" id="saved-badge" style="display:none">✓ Settings restored from last session</div>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <div class="topbar">
+    <div class="logo">Poly<em>Bot</em> <span class="logo-v">v14.0</span></div>
+    <div class="topbar-actions">
+      <button class="ibtn" id="theme-btn" onclick="toggleTheme()">🌙</button>
+      <button class="ibtn" id="search-btn" onclick="toggleSearch()" style="color:var(--g);border-color:var(--gb)">🔍 ON</button>
+      <button class="scan-btn" id="scan-btn" onclick="manualScan()">
+        <div class="sdot"></div><span id="scan-lbl">Scan</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <div class="tab on" onclick="showTab('signals',this)">SIGNALS</div>
+    <div class="tab" onclick="showTab('portfolio',this)">PORTFOLIO</div>
+    <div class="tab" onclick="showTab('log',this)">LOG</div>
+  </div>
+
+  <!-- SIGNALS -->
+  <div class="view on" id="view-signals">
+    <div class="url-bar">
+      <input class="url-inp" id="url-inp" type="url" placeholder="Paste polymarket.com URL to analyse…" onkeydown="if(event.key==='Enter')addMarketUrl()"/>
+      <button class="url-add" onclick="addMarketUrl()">+ Add</button>
+    </div>
+    <div class="feed" id="feed">
+      <div class="empty"><div class="empty-icon">📡</div><div class="empty-text">Tap Scan or paste a Polymarket URL</div></div>
+    </div>
+  </div>
+
+  <!-- PORTFOLIO -->
+  <div class="view" id="view-portfolio">
+    <div class="port-header">
+      <div class="pnl-big zer" id="pnl-big">£0.00</div>
+      <div class="pnl-label">PAPER P&L</div>
+    </div>
+    <div class="stats-row">
+      <div class="stat-box"><div class="stat-v" id="st-bal">£75</div><div class="stat-l">BALANCE</div></div>
+      <div class="stat-box"><div class="stat-v" id="st-wr">—</div><div class="stat-l">WIN RATE</div></div>
+      <div class="stat-box"><div class="stat-v" id="st-dep">£0</div><div class="stat-l">DEPLOYED</div></div>
+      <div class="stat-box"><div class="stat-v" id="st-cnt">0</div><div class="stat-l">TRADES</div></div>
+    </div>
+    <div class="sec-title">
+      OPEN POSITIONS
+      <span class="refresh-btn" onclick="refreshAll()">↻ Refresh</span>
+    </div>
+    <div class="updated-time" id="updated-time"></div>
+    <div id="positions"><div class="empty"><div class="empty-icon">📭</div><div class="empty-text">No open positions</div></div></div>
+  </div>
+
+  <!-- LOG -->
+  <div class="view" id="view-log">
+    <div class="sec-title">TRADE HISTORY</div>
+    <div id="tlog"><div class="empty"><div class="empty-icon">📋</div><div class="empty-text">No trades yet</div></div></div>
+  </div>
+</div>
+
+<div id="toasts"></div>
+
+<script>
+// ═══════════════════════════════════
+// CONFIG & STATE
+// ═══════════════════════════════════
+const AUTH = {u:'admin',p:'polymarketbot2026'};
+const WORKER = 'https://polybotproxy.kieranpotter442.workers.dev';
+const SAVE_KEY = 'polybot_v14';
+
+let cfg = {key:'',bal:75,stake:10};
+let webSearch = true;
+let isScanning = false;
+let scanIdx = 0;
+
+let S = {
+  positions: [],
+  trades: [],
+  bal: 75,
+};
+
+// ═══════════════════════════════════
+// PERSISTENCE
+// ═══════════════════════════════════
+function save(){
+  try{
+    localStorage.setItem(SAVE_KEY, JSON.stringify({
+      key: cfg.key,
+      bal: cfg.bal,
+      stake: cfg.stake,
+      sBal: S.bal,
+      trades: S.trades.map(t=>({...t,t:t.t.toISOString()})),
+      positions: S.positions,
+      scanIdx
+    }));
+  }catch(e){}
+}
+
+function loadSaved(){
+  try{
+    const d = JSON.parse(localStorage.getItem(SAVE_KEY)||'{}');
+    if(d.key) cfg.key = d.key;
+    if(d.bal) cfg.bal = d.bal;
+    if(d.stake) cfg.stake = d.stake;
+    if(d.sBal) S.bal = d.sBal;
+    if(d.trades) S.trades = d.trades.map(t=>({...t,t:new Date(t.t)}));
+    if(d.positions) S.positions = d.positions;
+    if(d.scanIdx) scanIdx = d.scanIdx;
+    return !!d.key;
+  }catch(e){return false;}
+}
+
+// ═══════════════════════════════════
+// LOGIN
+// ═══════════════════════════════════
+function doLogin(){
+  const u = document.getElementById('l-user').value.trim();
+  const p = document.getElementById('l-pass').value;
+  const err = document.getElementById('login-err');
+  if(u===AUTH.u && p===AUTH.p){
+    document.getElementById('login').style.display='none';
+    const hasSaved = loadSaved();
+    if(hasSaved){
+      document.getElementById('s-key').value = cfg.key;
+      document.getElementById('s-bal').value = cfg.bal;
+      document.getElementById('s-stake').value = cfg.stake;
+      document.getElementById('saved-badge').style.display='block';
+    }
+    document.getElementById('setup').style.display='block';
+  } else {
+    err.classList.add('show');
+    document.getElementById('l-pass').value='';
+    setTimeout(()=>err.classList.remove('show'),3000);
+  }
+}
+
+// ═══════════════════════════════════
+// LAUNCH
+// ═══════════════════════════════════
+function launch(){
+  const key = document.getElementById('s-key').value.trim();
+  if(!key.startsWith('sk-ant')){toast('Enter a valid Anthropic API key','err');return;}
+  cfg.key = key;
+  cfg.bal = parseFloat(document.getElementById('s-bal').value)||75;
+  cfg.stake = parseFloat(document.getElementById('s-stake').value)||10;
+  if(!S.bal || S.bal===75) S.bal = cfg.bal;
+  document.getElementById('setup').style.display='none';
+  document.getElementById('app').style.display='block';
+  save();
+  refreshAll();
+  renderPortfolio();
+  renderLog();
+  startPriceLoop();
+}
+
+// ═══════════════════════════════════
+// TABS
+// ═══════════════════════════════════
+function showTab(name,el){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('on'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
+  document.getElementById('view-'+name).classList.add('on');
+  el.classList.add('on');
+}
+
+// ═══════════════════════════════════
+// THEME & SEARCH TOGGLE
+// ═══════════════════════════════════
+function toggleTheme(){
+  const d = document.documentElement;
+  const t = d.getAttribute('data-theme')==='dark'?'light':'dark';
+  d.setAttribute('data-theme',t);
+  document.getElementById('theme-btn').textContent=t==='dark'?'🌙':'☀️';
+}
+
+function toggleSearch(){
+  webSearch = !webSearch;
+  const btn = document.getElementById('search-btn');
+  btn.textContent = webSearch ? '🔍 ON' : '🔍 OFF';
+  btn.style.color = webSearch ? 'var(--g)' : 'var(--muted)';
+  btn.style.borderColor = webSearch ? 'var(--gb)' : 'var(--border2)';
+  toast(webSearch ? 'Web search ON' : 'Web search OFF — using built-in knowledge', webSearch?'ok':'warn');
+}
+
+// ═══════════════════════════════════
+// POLYMARKET API
+// ═══════════════════════════════════
+async function fetchPolymarket(path){
+  try{
+    const r = await fetch(WORKER+path);
+    if(!r.ok) return null;
+    return await r.json();
+  }catch(e){return null;}
+}
+
+function parseMarket(m){
+  if(!m||!m.question) return null;
+  let yes=0.5;
+  try{
+    const p=JSON.parse(m.outcomePrices||'[0.5,0.5]');
+    yes=parseFloat(p[0])||0.5;
+  }catch(e){}
+  yes=Math.max(0.01,Math.min(0.99,yes));
+  const endDate=m.endDate||m.end_date||null;
+  const daysLeft=endDate?Math.ceil((new Date(endDate)-Date.now())/864e5):null;
+  const vol=parseFloat(m.volume24hr||m.volume||0);
+  const id=String(m.id||m.conditionId||Math.random().toString(36).slice(2));
+  const tags=(m.tags||[]).map(t=>(t.label||t.slug||'').toUpperCase()).filter(Boolean);
+  const cat=tags[0]||detectCat(m.question);
+  return{id,q:m.question,yes,no:1-yes,vol,cat,daysLeft,raw:m};
+}
+
+function detectCat(q){
+  if(!q) return 'OTHER';
+  const l=q.toLowerCase();
+  if(/bitcoin|btc|ethereum|eth|crypto|sol|xrp|doge/.test(l)) return 'CRYPTO';
+  if(/election|president|senate|trump|vote|congress|party/.test(l)) return 'POLITICS';
+  if(/fed|rate|gdp|inflation|recession|economy|s&p|nasdaq/.test(l)) return 'MACRO';
+  if(/nba|nfl|football|soccer|cricket|tennis|ufc|basketball|champions/.test(l)) return 'SPORTS';
+  if(/ai|gpt|openai|anthropic|google|microsoft|apple|tesla/.test(l)) return 'TECH';
+  return 'OTHER';
+}
+
+async function fetchMarkets(){
+  try{
+    // Fetch from multiple categories for variety
+    const [gen,crypto,sports,politics] = await Promise.all([
+      fetchPolymarket('/markets?active=true&closed=false&limit=50&order=volume24hr&ascending=false'),
+      fetchPolymarket('/markets?active=true&closed=false&limit=20&order=volume24hr&ascending=false&tag=crypto'),
+      fetchPolymarket('/markets?active=true&closed=false&limit=20&order=volume24hr&ascending=false&tag=sports'),
+      fetchPolymarket('/markets?active=true&closed=false&limit=20&order=volume24hr&ascending=false&tag=politics'),
+    ]);
+    const seen=new Set();
+    const all=[
+      ...(Array.isArray(gen)?gen:[]),
+      ...(Array.isArray(crypto)?crypto:[]),
+      ...(Array.isArray(sports)?sports:[]),
+      ...(Array.isArray(politics)?politics:[]),
+    ].filter(m=>{
+      if(!m||!m.question||!m.outcomePrices) return false;
+      if(seen.has(m.id)) return false;
+      seen.add(m.id); return true;
+    });
+    const parsed=all.map(parseMarket).filter(Boolean)
+      .filter(m=>m.yes>=0.10&&m.yes<=0.90)
+      .filter(m=>!m.daysLeft||m.daysLeft>3)
+      .filter(m=>m.vol>5000);
+    // Shuffle
+    for(let i=parsed.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[parsed[i],parsed[j]]=[parsed[j],parsed[i]];}
+    return parsed.length ? parsed : fallbackMarkets();
+  }catch(e){return fallbackMarkets();}
+}
+
+function fallbackMarkets(){
+  return [
+    {id:'fb1',q:'Will the Fed cut rates at May 2026 FOMC?',yes:0.52,no:0.48,vol:2840000,cat:'MACRO',daysLeft:56},
+    {id:'fb2',q:'Will Bitcoin exceed $150k before July 2026?',yes:0.44,no:0.56,vol:1920000,cat:'CRYPTO',daysLeft:112},
+    {id:'fb3',q:'Will S&P 500 close above 6500 before June 2026?',yes:0.55,no:0.45,vol:3100000,cat:'MACRO',daysLeft:82},
+    {id:'fb4',q:'Will Ethereum reach $6000 before end of 2026?',yes:0.38,no:0.62,vol:980000,cat:'CRYPTO',daysLeft:294},
+    {id:'fb5',q:'Will UK avoid recession in 2026?',yes:0.62,no:0.38,vol:420000,cat:'MACRO',daysLeft:294},
+    {id:'fb6',q:'Will gold exceed $3500 before end of 2026?',yes:0.51,no:0.49,vol:560000,cat:'MACRO',daysLeft:294},
+  ];
+}
+
+// ═══════════════════════════════════
+// LIVE PRICE HELPER (free APIs)
+// ═══════════════════════════════════
+async function getLivePrice(q){
+  const l=q.toLowerCase();
+  try{
+    if(/bitcoin|btc/.test(l)){
+      const r=await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd');
+      const d=await r.json();
+      return 'Bitcoin: $'+d.bitcoin.usd.toLocaleString();
+    }
+    if(/ethereum|eth/.test(l)){
+      const r=await fetch('https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd');
+      const d=await r.json();
+      return 'Ethereum: $'+d.ethereum.usd.toLocaleString();
+    }
+    if(/solana|sol/.test(l)){
+      const r=await fetch('https://api.coingecko.com/api/v3/simple/price?ids=solana&vs_currencies=usd');
+      const d=await r.json();
+      return 'Solana: $'+d.solana.usd.toLocaleString();
+    }
+  }catch(e){}
+  return null;
+}
+
+// ═══════════════════════════════════
+// CLAUDE ANALYSIS
+// ═══════════════════════════════════
+async function analyseMarket(m){
+  if(!cfg.key) throw new Error('No API key');
+  const livePrice = await getLivePrice(m.q);
+  const prompt = 'Prediction market analyst. Market: "'+m.q+'" YES:'+Math.round(m.yes*100)+'c NO:'+Math.round(m.no*100)+'c Vol:$'+(m.vol>=1e6?(m.vol/1e6).toFixed(1)+'M':(m.vol/1e3).toFixed(0)+'K')+(m.daysLeft?' Resolves:'+m.daysLeft+'d':'')+
+    (livePrice?'\nLive data: '+livePrice:'')+
+    '\nToday: '+new Date().toDateString()+
+    '\nAnalyse this market. Reply:\nANALYSIS: [2 sentences on probability vs price]\n{"signal":"BUY_YES"|"BUY_NO"|"SKIP","confidence":50-95,"fair_value":1-99,"edge":-20}';
+
+  const body={model:'claude-sonnet-4-20250514',max_tokens:400,messages:[{role:'user',content:prompt}]};
+  if(webSearch) body.tools=[{type:'web_search_20250305',name:'web_search'}];
+
+  const r=await fetch('https://api.anthropic.com/v1/messages',{
+    method:'POST',
+    headers:{'Content-Type':'application/json','x-api-key':cfg.key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+    body:JSON.stringify(body)
+  });
+  if(!r.ok){
+    const e=await r.json().catch(()=>({}));
+    throw new Error(e.error?.message||'API '+r.status);
+  }
+  const data=await r.json();
+  const txt=data.content.filter(b=>b.type==='text').map(b=>b.text).join('\n');
+
+  let signal={signal:'SKIP',confidence:50,fair_value:Math.round(m.yes*100),edge:0};
+  const lines=txt.split('\n').filter(l=>l.trim());
+  for(let i=lines.length-1;i>=0;i--){
+    try{const j=JSON.parse(lines[i].replace(/```json|```/g,'').trim());if(j.signal){signal=j;break;}}catch(e){}
+  }
+  const am=txt.match(/ANALYSIS:\s*([^\n]+(?:\n(?![\[{])[^\n]+)?)/i);
+  const analysis=am?am[1].trim().slice(0,280):'Analysis complete.';
+  return{...signal,analysis};
+}
+
+// ═══════════════════════════════════
+// SCAN
+// ═══════════════════════════════════
+async function manualScan(){
+  if(isScanning){toast('Already scanning…','warn');return;}
+  isScanning=true;
+  const btn=document.getElementById('scan-btn');
+  const lbl=document.getElementById('scan-lbl');
+  btn.classList.add('loading');
+  lbl.textContent='Scanning…';
+
+  try{
+    const markets=await fetchMarkets();
+    let found=null;
+    for(let i=0;i<markets.length;i++){
+      const m=markets[scanIdx%markets.length];
+      scanIdx++;
+      if(!document.getElementById('sc-'+m.id)){found=m;break;}
+    }
+    if(!found){
+      // Clear screen and try again
+      document.querySelectorAll('.sig-card').forEach(c=>c.remove());
+      scanIdx=0;
+      const m=markets[0];
+      if(m) found=m;
+    }
+    if(found){
+      const feed=document.getElementById('feed');
+      const empty=feed.querySelector('.empty');if(empty)empty.remove();
+      addCard(found);
+      try{
+        const res=await analyseMarket(found);
+        updateCard(found.id,found,res);
+      }catch(e){
+        showCardError(found.id,e.message);
+      }
+    }
+  }catch(e){
+    toast('Scan failed: '+e.message,'err');
+  }
+
+  isScanning=false;
+  btn.classList.remove('loading');
+  lbl.textContent='Scan';
+  save();
+}
+
+// ═══════════════════════════════════
+// CARDS
+// ═══════════════════════════════════
+function addCard(m){
+  const feed=document.getElementById('feed');
+  const d=document.createElement('div');
+  d.className='sig-card neutral';
+  d.id='sc-'+m.id;
+  d.innerHTML=`
+    <div class="card-top">
+      <div class="card-q">${m.q}</div>
+      <div class="card-pill pill-loading" id="pill-${m.id}">⏳</div>
+    </div>
+    <div class="card-meta">
+      <span class="meta-tag">${m.cat}</span>
+      <span class="meta-tag mono">${Math.round(m.yes*100)}¢ YES</span>
+      ${m.daysLeft?'<span class="meta-tag mono">'+m.daysLeft+'d</span>':''}
+      <span class="meta-tag mono">$${m.vol>=1e6?(m.vol/1e6).toFixed(1)+'M':(m.vol/1e3).toFixed(0)+'K'} vol</span>
+    </div>
+    <div class="thinking"><span>Analysing</span><div class="dots"><span></span><span></span><span></span></div></div>
+    <div id="card-body-${m.id}"></div>
+  `;
+  feed.insertBefore(d,feed.firstChild);
+}
+
+function updateCard(id,m,res){
+  const card=document.getElementById('sc-'+id);
+  if(!card) return;
+
+  // Update pill
+  const pill=document.getElementById('pill-'+id);
+  if(res.signal==='BUY_YES'){pill.className='card-pill pill-yes';pill.textContent='▲ BUY YES';card.className='sig-card bullish';}
+  else if(res.signal==='BUY_NO'){pill.className='card-pill pill-no';pill.textContent='▼ BUY NO';card.className='sig-card bearish';}
+  else{pill.className='card-pill pill-skip';pill.textContent='SKIP';card.className='sig-card neutral';}
+
+  // Remove thinking
+  const thinking=card.querySelector('.thinking');if(thinking)thinking.remove();
+
+  const body=document.getElementById('card-body-'+id);
+  const canTrade=res.signal!=='SKIP';
+  const stake=cfg.stake;
+
+  body.innerHTML=`
+    <div class="card-analysis">${res.analysis}</div>
+    ${canTrade?`
+    <div class="card-metrics">
+      <div class="metric"><div class="metric-v" style="color:${res.edge>0?'var(--g)':'var(--r)'}">${res.edge>0?'+':''}${res.edge}¢</div><div class="metric-l">EDGE</div></div>
+      <div class="metric"><div class="metric-v">${res.fair_value}¢</div><div class="metric-l">FAIR</div></div>
+      <div class="metric"><div class="metric-v" style="color:${res.confidence>=75?'var(--g)':res.confidence>=60?'var(--y)':'var(--r)'}">${res.confidence}%</div><div class="metric-l">CONF</div></div>
+      <div class="metric"><div class="metric-v">£${stake}</div><div class="metric-l">STAKE</div></div>
+    </div>
+    <div class="card-actions">
+      <button class="act-yes" onclick="logTrade('${id}','YES',${res.confidence},${res.edge},${m.yes})">YES £${stake}</button>
+      <button class="act-no" onclick="logTrade('${id}','NO',${res.confidence},${res.edge},${m.yes})">NO £${stake}</button>
+      <button class="act-skip" onclick="dismissCard('${id}')">Skip</button>
+    </div>`:`
+    <div class="card-actions">
+      <button class="act-skip" onclick="dismissCard('${id}')" style="flex:1">Dismiss</button>
+    </div>`}
+  `;
+}
+
+function showCardError(id,msg){
+  const card=document.getElementById('sc-'+id);if(!card)return;
+  const thinking=card.querySelector('.thinking');if(thinking)thinking.remove();
+  const pill=document.getElementById('pill-'+id);if(pill){pill.className='card-pill pill-skip';pill.textContent='ERROR';}
+  const body=document.getElementById('card-body-'+id);
+  if(body) body.innerHTML=`<div class="err-card">${msg}</div><div class="card-actions"><button class="act-skip" onclick="dismissCard('${id}')" style="flex:1">Dismiss</button></div>`;
+}
+
+function dismissCard(id){
+  const card=document.getElementById('sc-'+id);
+  if(card){
+    card.style.transition='opacity .25s,transform .25s';
+    card.style.opacity='0';
+    card.style.transform='translateX(50px)';
+    setTimeout(()=>card.remove(),250);
+  }
+}
+
+// ═══════════════════════════════════
+// URL ADD
+// ═══════════════════════════════════
+async function addMarketUrl(){
+  if(!cfg.key){toast('Enter API key first','err');return;}
+  const inp=document.getElementById('url-inp');
+  const url=inp.value.trim();
+  if(!url||!url.includes('polymarket')){toast('Paste a polymarket.com URL','err');return;}
+  inp.value='';
+  toast('Looking up market…');
+  try{
+    const prompt='Look up this Polymarket URL: '+url+'\nFind the market and reply:\nQ: [exact market question]\nYES: [current yes price 0-100]\nEND: [resolution date YYYY-MM-DD or unknown]';
+    const body={model:'claude-sonnet-4-20250514',max_tokens:200,tools:[{type:'web_search_20250305',name:'web_search'}],messages:[{role:'user',content:prompt}]};
+    const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':cfg.key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify(body)});
+    if(!r.ok) throw new Error('API '+r.status);
+    const data=await r.json();
+    const txt=data.content.filter(b=>b.type==='text').map(b=>b.text).join('\n');
+    const qm=txt.match(/Q:\s*([^\n]+)/i);
+    const ym=txt.match(/YES:\s*([\d.]+)/i);
+    const em=txt.match(/END:\s*(\d{4}-\d{2}-\d{2})/i);
+    if(!qm||!ym){toast('Could not find market — try again','err');return;}
+    const yesRaw=parseFloat(ym[1]);
+    const yes=yesRaw>1?yesRaw/100:yesRaw;
+    const m={id:'url_'+Date.now(),q:qm[1].trim(),yes,no:1-yes,vol:0,cat:detectCat(qm[1]),daysLeft:em?Math.ceil((new Date(em[1])-Date.now())/864e5):null};
+    if(m.yes<0.05||m.yes>0.95){toast('Market too extreme to analyse reliably','warn');return;}
+    const feed=document.getElementById('feed');
+    const empty=feed.querySelector('.empty');if(empty)empty.remove();
+    addCard(m);
+    toast('Market added — analysing…','ok');
+    try{const res=await analyseMarket(m);updateCard(m.id,m,res);}
+    catch(e){showCardError(m.id,e.message);}
+  }catch(e){toast('Failed: '+e.message,'err');}
+}
+
+// ═══════════════════════════════════
+// TRADING
+// ═══════════════════════════════════
+function logTrade(cardId,side,conf,edge,yesPrice){
+  const card=document.getElementById('sc-'+cardId);
+  if(!card) return;
+  const q=card.querySelector('.card-q').textContent;
+  const stake=cfg.stake;
+  const ep=side==='YES'?yesPrice:(1-yesPrice);
+  const shares=+(stake/ep).toFixed(2);
+
+  S.bal-=stake;
+  S.positions.push({id:Date.now(),mid:cardId,side,stake,shares,ep,cp:ep,pnl:0,q,realPrice:false,openedAt:Date.now(),conf,edge});
+  S.trades.push({t:new Date(),side,stake,price:ep,q,conf,edge,won:undefined,pnl:undefined});
+
+  // Update card
+  const body=document.getElementById('card-body-'+cardId);
+  if(body) body.innerHTML=`<div class="card-done">✓ ${side} £${stake} logged at ${Math.round(ep*100)}¢ — place on polymarket.com</div>`;
+
+  save();
+  renderPortfolio();
+  renderLog();
+  toast('£'+stake+' '+side+' logged 🚀','ok');
+}
+
+// ═══════════════════════════════════
+// PORTFOLIO
+// ═══════════════════════════════════
+function renderPortfolio(){
+  const pnl=S.positions.reduce((s,p)=>s+p.pnl,0);
+  const el=document.getElementById('pnl-big');
+  el.textContent=(pnl>=0?'+£':'-£')+Math.abs(pnl).toFixed(2);
+  el.className='pnl-big '+(pnl>0?'pos':pnl<0?'neg':'zer');
+  const dep=S.positions.reduce((s,p)=>s+p.stake,0);
+  const wins=S.trades.filter(t=>t.won===true).length;
+  const closed=S.trades.filter(t=>t.won!==undefined).length;
+  document.getElementById('st-bal').textContent='£'+S.bal.toFixed(0);
+  document.getElementById('st-wr').textContent=closed?Math.round(wins/closed*100)+'%':'—';
+  document.getElementById('st-dep').textContent='£'+dep.toFixed(0);
+  document.getElementById('st-cnt').textContent=S.trades.length;
+
+  const pos=document.getElementById('positions');
+  if(!S.positions.length){
+    pos.innerHTML='<div class="empty"><div class="empty-icon">📭</div><div class="empty-text">No open positions</div></div>';
+    return;
+  }
+  pos.innerHTML=S.positions.slice().reverse().map(p=>`
+    <div class="pos-card">
+      <div class="pos-top">
+        <div class="pos-q">${p.q}</div>
+        <div class="pos-pnl ${p.pnl>=0?'pos':'neg'}">${p.pnl>=0?'+£':'-£'}${Math.abs(p.pnl).toFixed(2)}</div>
+      </div>
+      <div class="pos-bottom">
+        <span class="pos-tag ${p.side.toLowerCase()}">${p.side}</span>
+        <span class="pos-meta">£${p.stake} · ${p.shares}sh · ${Math.round(p.cp*100)}¢ ${p.realPrice?'● LIVE':'● EST'}</span>
+        <button class="close-btn" onclick="closePosition(${p.id})">Close Trade</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function closePosition(posId){
+  const p=S.positions.find(x=>x.id===posId);if(!p) return;
+  const won=p.pnl>=0;
+  S.bal+=p.stake+p.pnl;
+  S.positions=S.positions.filter(x=>x.id!==posId);
+  const t=S.trades.find(t=>t.q===p.q&&t.side===p.side&&!t.won);
+  if(t){t.won=won;t.pnl=p.pnl;}
+  save();
+  renderPortfolio();
+  renderLog();
+  toast('Trade closed · '+(p.pnl>=0?'+':'')+'£'+p.pnl.toFixed(2),p.pnl>=0?'ok':'err');
+}
+
+// ═══════════════════════════════════
+// REAL PRICES
+// ═══════════════════════════════════
+async function fetchRealPrices(){
+  if(!S.positions.length) return;
+  try{
+    const bulk=await fetchPolymarket('/markets?active=true&closed=false&limit=200&order=volume24hr&ascending=false');
+    const closed=await fetchPolymarket('/markets?active=false&closed=true&limit=100&order=volume24hr&ascending=false');
+    const arr=[...(Array.isArray(bulk)?bulk:[]),...(Array.isArray(closed)?closed:[])];
+    let updated=0;
+    for(const p of S.positions){
+      const match=arr.find(m=>String(m.id)===String(p.mid))
+        ||arr.find(m=>m.question&&p.q&&m.question===p.q)
+        ||arr.find(m=>m.question&&p.q&&m.question.toLowerCase().includes(p.q.slice(0,25).toLowerCase()));
+      if(match&&match.outcomePrices){
+        try{
+          const prices=JSON.parse(match.outcomePrices);
+          const rp=p.side==='YES'?parseFloat(prices[0]):parseFloat(prices[1]);
+          if(rp>0&&rp<1){p.cp=rp;p.pnl=(rp-p.ep)*p.shares;p.realPrice=true;updated++;}
+        }catch(e){}
+      }
+    }
+    if(updated){
+      renderPortfolio();
+      const ts=document.getElementById('updated-time');
+      if(ts) ts.textContent='Updated '+new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+      save();
+    }
+  }catch(e){}
+}
+
+async function refreshAll(){
+  await fetchRealPrices();
+  renderPortfolio();
+  toast('Prices refreshed','ok');
+}
+
+function startPriceLoop(){
+  (async function loop(){
+    while(true){
+      await new Promise(r=>setTimeout(r,30000));
+      await fetchRealPrices();
+    }
+  })();
+}
+
+// ═══════════════════════════════════
+// LOG
+// ═══════════════════════════════════
+function renderLog(){
+  const el=document.getElementById('tlog');
+  if(!S.trades.length){
+    el.innerHTML='<div class="empty"><div class="empty-icon">📋</div><div class="empty-text">No trades yet</div></div>';
+    return;
+  }
+  el.innerHTML=S.trades.slice().reverse().map((t,i)=>{
+    const wonCol=t.won===true?'var(--g)':t.won===false?'var(--r)':'var(--muted)';
+    const wonLabel=t.won===true?'WON':t.won===false?'LOST':'OPEN';
+    const pnlStr=t.pnl!==undefined?(t.pnl>=0?'+£':'-£')+Math.abs(t.pnl).toFixed(2):'—';
+    return `<div class="log-item" onclick="this.querySelector('.log-detail').style.display=this.querySelector('.log-detail').style.display==='block'?'none':'block'">
+      <div class="log-top">
+        <span class="log-side ${t.side.toLowerCase()}">${t.side}</span>
+        <span class="log-status" style="color:${wonCol}">${wonLabel} ${t.pnl!==undefined?pnlStr:''}</span>
+      </div>
+      <div class="log-q">${t.q}</div>
+      <div class="log-meta">${t.t.toLocaleDateString('en-GB')} ${t.t.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'})} · £${t.stake} @ ${Math.round(t.price*100)}¢</div>
+      <div class="log-detail">
+        <div class="log-detail-grid">
+          <div class="log-detail-item"><div class="log-detail-v">${t.conf||'—'}%</div><div class="log-detail-l">CONF</div></div>
+          <div class="log-detail-item"><div class="log-detail-v">${t.edge?t.edge+'¢':'—'}</div><div class="log-detail-l">EDGE</div></div>
+          <div class="log-detail-item"><div class="log-detail-v" style="color:${wonCol}">${pnlStr}</div><div class="log-detail-l">P&L</div></div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════
+// TOAST
+// ═══════════════════════════════════
+function toast(msg,type=''){
+  const c=document.getElementById('toasts');
+  const el=document.createElement('div');
+  el.className='toast '+(type||'');
+  el.textContent=msg;
+  c.appendChild(el);
+  setTimeout(()=>{el.style.opacity='0';setTimeout(()=>el.remove(),300);},3000);
+}
+
+// ═══════════════════════════════════
+// INIT
+// ═══════════════════════════════════
+document.addEventListener('DOMContentLoaded',()=>{
+  document.getElementById('l-user').focus();
+});
+</script>
+</body>
+</html>
